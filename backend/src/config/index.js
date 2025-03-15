@@ -9,14 +9,14 @@ dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 export const config = {
   port: process.env.PORT || 3000,
-  openaiApiKey: process.env.OPENAI_API_KEY,
+  openaiApiKey: process.env.DASHSCOPE_API_KEY,
   qweatherApiKey: process.env.QWEATHER_API_KEY,
   amapApiKey: process.env.AMAP_API_KEY
 };
 
 export const validateConfig = () => {
   const requiredEnvVars = [
-    'OPENAI_API_KEY',
+    'DASHSCOPE_API_KEY',
     'QWEATHER_API_KEY',
     'AMAP_API_KEY'
   ];
