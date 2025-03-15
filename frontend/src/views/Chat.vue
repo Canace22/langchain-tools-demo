@@ -3,7 +3,7 @@
     <a-layout-sider class="chat-sider" width="260">
       <div class="logo">
         <robot-outlined class="logo-icon" />
-        <span>AI Chat</span>
+        <span>早安 AI</span>
       </div>
       <a-button type="primary" class="new-chat" block @click="createNewChat">
         <plus-outlined />
@@ -11,11 +11,18 @@
       </a-button>
       <div class="chat-list">
         <a-menu mode="inline" theme="dark" v-model:selectedKeys="selectedChat">
-          <a-menu-item v-for="chat in chatList" :key="chat.id" @click="selectChat(chat)">
+          <a-menu-item
+            v-for="chat in chatList"
+            :key="chat.id"
+            @click="selectChat(chat)"
+          >
             <div class="chat-item">
               <message-outlined />
               <span class="chat-title">{{ chat.title }}</span>
-              <delete-outlined class="delete-icon" @click.stop="deleteChat(chat.id)" />
+              <delete-outlined
+                class="delete-icon"
+                @click.stop="deleteChat(chat.id)"
+              />
             </div>
           </a-menu-item>
         </a-menu>
@@ -43,7 +50,7 @@
         </a-dropdown>
       </div>
     </a-layout-sider>
-    
+
     <a-layout class="chat-container">
       <a-layout-header class="chat-header">
         <div class="header-content">
@@ -57,12 +64,21 @@
           </div>
         </div>
       </a-layout-header>
-      
+
       <a-layout-content class="chat-content" ref="messageContainer">
         <div class="message-list">
-          <div v-for="msg in messages" :key="msg.id" :class="['message', msg.type]">
+          <div
+            v-for="msg in messages"
+            :key="msg.id"
+            :class="['message', msg.type]"
+          >
             <div class="avatar">
-              <a-avatar :size="40" :style="{ backgroundColor: msg.type === 'user' ? '#87d068' : '#1890ff' }">
+              <a-avatar
+                :size="40"
+                :style="{
+                  backgroundColor: msg.type === 'user' ? '#87d068' : '#1890ff'
+                }"
+              >
                 <template #icon>
                   <user-outlined v-if="msg.type === 'user'" />
                   <robot-outlined v-else />
@@ -71,12 +87,19 @@
             </div>
             <div class="message-body">
               <div class="message-info">
-                <span class="sender">{{ msg.type === 'user' ? 'You' : 'AI Assistant' }}</span>
+                <!-- <span class="sender">{{ msg.type === 'user' ? 'You' : 'AI Assistant' }}</span> -->
                 <span class="time">{{ formatTime(msg.timestamp) }}</span>
               </div>
-              <div class="message-content" v-html="formatMessage(msg.content)"></div>
+              <div
+                class="message-content"
+                v-html="formatMessage(msg.content)"
+              ></div>
               <div class="message-actions" v-if="msg.type === 'ai'">
-                <a-button type="text" size="small" @click="copyMessage(msg.content)">
+                <a-button
+                  type="text"
+                  size="small"
+                  @click="copyMessage(msg.content)"
+                >
                   <copy-outlined /> 复制
                 </a-button>
               </div>
@@ -96,7 +119,7 @@
           </div>
         </div>
       </a-layout-content>
-      
+
       <a-layout-footer class="chat-footer">
         <div class="input-container">
           <a-textarea
@@ -107,9 +130,9 @@
             @keydown.enter.exact.prevent="sendMessage"
             @keydown.enter.shift.prevent="newline"
           />
-          <a-button 
-            type="primary" 
-            class="send-button" 
+          <a-button
+            type="primary"
+            class="send-button"
             @click="sendMessage"
             :disabled="!inputMessage.trim() || isTyping"
           >
@@ -123,10 +146,17 @@
 </template>
 
 <script>
-import { defineComponent, ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
-import { 
-  PlusOutlined, 
-  MessageOutlined, 
+import {
+  defineComponent,
+  ref,
+  computed,
+  nextTick,
+  onMounted,
+  onUnmounted
+} from 'vue';
+import {
+  PlusOutlined,
+  MessageOutlined,
   SendOutlined,
   DeleteOutlined,
   CopyOutlined,
@@ -135,8 +165,8 @@ import {
   ClearOutlined,
   UserOutlined,
   RobotOutlined
-} from '@ant-design/icons-vue'
-import { message } from 'ant-design-vue'
+} from '@ant-design/icons-vue';
+import { message } from 'ant-design-vue';
 
 export default defineComponent({
   name: 'Chat',
@@ -153,180 +183,188 @@ export default defineComponent({
     RobotOutlined
   },
   setup() {
-    const selectedChat = ref(['1'])
-    const inputMessage = ref('')
-    const isTyping = ref(false)
-    const messageContainer = ref(null)
-    const ws = ref(null)
-    
+    const selectedChat = ref(['1']);
+    const inputMessage = ref('');
+    const isTyping = ref(false);
+    const messageContainer = ref(null);
+    const ws = ref(null);
+
     const chatList = ref([
       { id: '1', title: '新对话 1' },
-      { id: '2', title: '新对话 2' },
-    ])
-    
+      { id: '2', title: '新对话 2' }
+    ]);
+
     const messages = ref([
-      { 
-        id: 1, 
-        type: 'ai', 
-        content: '你好！我是AI助手，有什么可以帮你的吗？',
+      {
+        id: 1,
+        type: 'ai',
+        content: '你好，我能为你做些什么？',
         timestamp: Date.now() - 1000
-      },
-      { 
-        id: 2, 
-        type: 'user', 
-        content: '你好！',
-        timestamp: Date.now()
-      },
-    ])
+      }
+    ]);
 
     const currentChat = computed(() => {
-      return chatList.value.find(chat => chat.id === selectedChat.value[0])
-    })
-    
+      return chatList.value.find((chat) => chat.id === selectedChat.value[0]);
+    });
+
     const createNewChat = () => {
-      const newId = String(chatList.value.length + 1)
+      const newId = String(chatList.value.length + 1);
       chatList.value.unshift({
         id: newId,
         title: `新对话 ${newId}`
-      })
-      selectedChat.value = [newId]
-      messages.value = []
-    }
+      });
+      selectedChat.value = [newId];
+      messages.value = [];
+    };
 
     const deleteChat = (id) => {
-      const index = chatList.value.findIndex(chat => chat.id === id)
+      const index = chatList.value.findIndex((chat) => chat.id === id);
       if (index > -1) {
-        chatList.value.splice(index, 1)
+        chatList.value.splice(index, 1);
         if (selectedChat.value[0] === id) {
-          selectedChat.value = chatList.value.length ? [chatList.value[0].id] : []
+          selectedChat.value = chatList.value.length
+            ? [chatList.value[0].id]
+            : [];
         }
       }
-    }
+    };
 
     const selectChat = (chat) => {
-      selectedChat.value = [chat.id]
-    }
+      selectedChat.value = [chat.id];
+    };
 
     const clearMessages = () => {
-      messages.value = []
-    }
+      messages.value = [];
+    };
 
     const scrollToBottom = async () => {
-      await nextTick()
+      await nextTick();
       if (messageContainer.value) {
-        messageContainer.value.scrollTop = messageContainer.value.scrollHeight
+        messageContainer.value.scrollTop = messageContainer.value.scrollHeight;
       }
-    }
+    };
 
     // WebSocket setup
     const setupWebSocket = () => {
-      const baseUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : process.env.BASE_URL
-      const wsClient = new WebSocket(`ws://${window.location.hostname}:3000/ws`)
-      
+      const baseUrl =
+        process.env.NODE_ENV === 'development'
+          ? 'http://localhost:3000'
+          : process.env.BASE_URL;
+      const wsClient = new WebSocket(
+        `ws://${window.location.hostname}:3000/ws`
+      );
+
       wsClient.onopen = () => {
-        console.log('WebSocket connection established')
-      }
-      
+        console.log('WebSocket connection established');
+      };
+
       wsClient.onmessage = (event) => {
-        const data = JSON.parse(event.data)
+        const data = JSON.parse(event.data);
         if (data.error) {
-          message.error(data.error)
+          message.error(data.error);
         } else {
           messages.value.push({
             id: messages.value.length + 1,
             type: 'ai',
             content: data.response,
             timestamp: Date.now()
-          })
-          scrollToBottom()
+          });
+          scrollToBottom();
         }
-      }
-      
+      };
+
       wsClient.onerror = (error) => {
-        console.error('WebSocket error:', error)
-        message.error('Connection error, falling back to HTTP mode')
-      }
-      
-      ws.value = wsClient
-    }
-    
+        console.error('WebSocket error:', error);
+        message.error('Connection error, falling back to HTTP mode');
+      };
+
+      ws.value = wsClient;
+    };
+
     const simulateAIResponse = async () => {
-      isTyping.value = true
-      
+      isTyping.value = true;
+
       try {
         if (ws.value && ws.value.readyState === WebSocket.OPEN) {
           // Send message through WebSocket
-          ws.value.send(JSON.stringify({ 
-            message: messages.value[messages.value.length - 1].content 
-          }))
+          ws.value.send(
+            JSON.stringify({
+              message: messages.value[messages.value.length - 1].content
+            })
+          );
         } else {
           // Fallback to HTTP request
-          await new Promise(resolve => setTimeout(resolve, 1000))
+          await new Promise((resolve) => setTimeout(resolve, 1000));
           messages.value.push({
             id: messages.value.length + 1,
             type: 'ai',
             content: '我明白了。让我来帮助你解决这个问题...',
             timestamp: Date.now()
-          })
+          });
         }
       } catch (error) {
-        console.error('Failed to send message:', error)
-        message.error('发送消息失败，请重试')
+        console.error('Failed to send message:', error);
+        message.error('发送消息失败，请重试');
       } finally {
-        isTyping.value = false
-        scrollToBottom()
+        isTyping.value = false;
+        scrollToBottom();
       }
-    }
-    
+    };
+
     // Setup WebSocket on component mount
     onMounted(() => {
-      setupWebSocket()
-    })
-    
+      setupWebSocket();
+    });
+
     // Cleanup WebSocket on component unmount
     onUnmounted(() => {
       if (ws.value) {
-        ws.value.close()
+        ws.value.close();
       }
-    })
-    
+    });
+
     const sendMessage = async () => {
-      if (!inputMessage.value.trim() || isTyping.value) return
-      
+      if (!inputMessage.value.trim() || isTyping.value) return;
+
       const userMessage = {
         id: messages.value.length + 1,
         type: 'user',
         content: inputMessage.value,
         timestamp: Date.now()
-      }
-      
-      messages.value.push(userMessage)
-      inputMessage.value = ''
-      scrollToBottom()
-      
-      await simulateAIResponse()
-    }
+      };
+
+      messages.value.push(userMessage);
+      inputMessage.value = '';
+      scrollToBottom();
+
+      await simulateAIResponse();
+    };
 
     const newline = () => {
-      inputMessage.value += '\n'
-    }
+      inputMessage.value += '\n';
+    };
 
     const copyMessage = (content) => {
-      navigator.clipboard.writeText(content)
-      message.success('已复制到剪贴板')
-    }
+      navigator.clipboard.writeText(content);
+      message.success('已复制到剪贴板');
+    };
 
     const formatTime = (timestamp) => {
       return new Date(timestamp).toLocaleTimeString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
         hour: '2-digit',
-        minute: '2-digit'
-      })
-    }
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+      });
+    };
 
     const formatMessage = (content) => {
-      return content.replace(/\n/g, '<br>')
-    }
-    
+      return content.replace(/\n/g, '<br>');
+    };
+
     return {
       selectedChat,
       chatList,
@@ -347,9 +385,9 @@ export default defineComponent({
       ws,
       setupWebSocket,
       simulateAIResponse
-    }
+    };
   }
-})
+});
 </script>
 
 <style scoped>
@@ -529,12 +567,21 @@ export default defineComponent({
   animation: typing 1.4s infinite;
 }
 
-.dot:nth-child(2) { animation-delay: 0.2s; }
-.dot:nth-child(3) { animation-delay: 0.4s; }
+.dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
 
 @keyframes typing {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
 }
 
 .chat-footer {
@@ -564,4 +611,4 @@ export default defineComponent({
   align-items: center;
   gap: 4px;
 }
-</style> 
+</style>
