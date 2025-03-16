@@ -27,27 +27,25 @@
           </a-menu-item>
         </a-menu>
       </div>
-      <div class="user-info">
-        <a-dropdown>
-          <div class="user-dropdown">
-            <a-avatar style="background-color: #87d068">
-              <template #icon><user-outlined /></template>
-            </a-avatar>
-            <span class="username">User</span>
-          </div>
-          <template #overlay>
-            <a-menu>
-              <a-menu-item key="settings">
-                <setting-outlined />
-                设置
-              </a-menu-item>
-              <a-menu-item key="logout">
-                <logout-outlined />
-                退出
-              </a-menu-item>
-            </a-menu>
-          </template>
-        </a-dropdown>
+      
+      <!-- 工具面板 -->
+      <div class="tools-panel">
+        <div class="tools-header">
+          <tool-outlined />
+          <span>工具箱</span>
+        </div>
+        <a-menu mode="inline" theme="dark" v-model:selectedKeys="selectedTool">
+          <a-menu-item
+            v-for="tool in tools"
+            :key="tool.id"
+            @click="selectTool(tool)"
+          >
+            <div class="tool-item">
+              <component :is="tool.icon" />
+              <span class="tool-title">{{ tool.title }}</span>
+            </div>
+          </a-menu-item>
+        </a-menu>
       </div>
     </a-layout-sider>
 
@@ -61,6 +59,26 @@
                 <clear-outlined />
               </a-button>
             </a-tooltip>
+            <a-dropdown>
+              <div class="user-dropdown">
+                <a-avatar style="background-color: #87d068">
+                  <template #icon><user-outlined /></template>
+                </a-avatar>
+                <span class="username">User</span>
+              </div>
+              <template #overlay>
+                <a-menu>
+                  <a-menu-item key="settings">
+                    <setting-outlined />
+                    设置
+                  </a-menu-item>
+                  <a-menu-item key="logout">
+                    <logout-outlined />
+                    退出
+                  </a-menu-item>
+                </a-menu>
+              </template>
+            </a-dropdown>
           </div>
         </div>
       </a-layout-header>
@@ -124,7 +142,7 @@
         <div class="input-container">
           <a-textarea
             v-model:value="inputMessage"
-            placeholder="输入消息，比如：“珠海天气怎么样”，按 Enter 发送，Shift + Enter 换行..."
+            placeholder="输入消息，例如：珠海天气怎么样，按 Enter 发送，Shift + Enter 换行..."
             :auto-size="{ minRows: 1, maxRows: 4 }"
             @pressEnter.prevent="sendMessage"
             @keydown.enter.exact.prevent="sendMessage"
@@ -164,7 +182,11 @@ import {
   LogoutOutlined,
   ClearOutlined,
   UserOutlined,
-  RobotOutlined
+  RobotOutlined,
+  ToolOutlined,
+  PictureOutlined,
+  CloudOutlined,
+  EnvironmentOutlined
 } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
 
@@ -180,7 +202,11 @@ export default defineComponent({
     LogoutOutlined,
     ClearOutlined,
     UserOutlined,
-    RobotOutlined
+    RobotOutlined,
+    ToolOutlined,
+    PictureOutlined,
+    CloudOutlined,
+    EnvironmentOutlined
   },
   setup() {
     const selectedChat = ref(['1']);
@@ -323,21 +349,95 @@ export default defineComponent({
       }
     });
 
+    // 工具相关
+    const selectedTool = ref([]);
+    const tools = ref([
+      {
+        id: 'image-processor',
+        title: '图片处理',
+        icon: 'PictureOutlined',
+        description: '支持图片批量处理、重命名、整理等功能',
+        examples: [
+          '处理目录 /path/to/images 按日期',
+          '统计目录 /path/to/images',
+          '整理图片 /path/to/images 复制'
+        ]
+      },
+      {
+        id: 'weather',
+        title: '天气查询',
+        icon: 'CloudOutlined',
+        description: '查询全国各地天气信息',
+        examples: [
+          '深圳天气怎么样？',
+          '北京今天天气如何？',
+          '查询上海的天气'
+        ]
+      },
+      {
+        id: 'location',
+        title: '地理位置',
+        icon: 'EnvironmentOutlined',
+        description: '查询地理位置信息',
+        examples: [
+          '珠海市在哪里？',
+          '查询广州的位置',
+          '深圳市位置在哪'
+        ]
+      }
+    ]);
+
+    const selectTool = (tool) => {
+      // 创建新的工具上下文对话
+      const newId = String(chatList.value.length + 1);
+      chatList.value.unshift({
+        id: newId,
+        title: `${tool.title} 对话`,
+        toolId: tool.id
+      });
+      selectedChat.value = [newId];
+      messages.value = [
+        {
+          id: Date.now(),
+          type: 'ai',
+          content: `我是${tool.title}助手，${tool.description}\n\n您可以这样问我：\n${tool.examples.map(e => `- ${e}`).join('\n')}`,
+          timestamp: Date.now()
+        }
+      ];
+      selectedTool.value = [tool.id];
+    };
+
     const sendMessage = async () => {
       if (!inputMessage.value.trim() || isTyping.value) return;
 
-      const userMessage = {
-        id: messages.value.length + 1,
+      const currentToolId = currentChat.value?.toolId;
+      const messageText = inputMessage.value.trim();
+      
+      // 添加用户消息
+      messages.value.push({
+        id: Date.now(),
         type: 'user',
-        content: inputMessage.value,
+        content: messageText,
         timestamp: Date.now()
-      };
+      });
 
-      messages.value.push(userMessage);
       inputMessage.value = '';
       scrollToBottom();
 
-      await simulateAIResponse();
+      // 设置正在输入状态
+      isTyping.value = true;
+
+      try {
+        // 发送消息到服务器
+        ws.value.send(JSON.stringify({ 
+          message: messageText,
+          toolId: currentToolId // 添加工具上下文
+        }));
+      } catch (error) {
+        console.error('发送消息失败:', error);
+        message.error('发送消息失败，请重试');
+        isTyping.value = false;
+      }
     };
 
     const newline = () => {
@@ -384,7 +484,10 @@ export default defineComponent({
       formatMessage,
       ws,
       setupWebSocket,
-      simulateAIResponse
+      simulateAIResponse,
+      tools,
+      selectedTool,
+      selectTool
     };
   }
 });
@@ -447,23 +550,6 @@ export default defineComponent({
 
 .chat-item:hover .delete-icon {
   opacity: 1;
-}
-
-.user-info {
-  padding: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.user-dropdown {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: white;
-  cursor: pointer;
-}
-
-.username {
-  flex: 1;
 }
 
 .chat-container {
@@ -610,5 +696,66 @@ export default defineComponent({
   display: flex;
   align-items: center;
   gap: 4px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-dropdown {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.user-dropdown:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.username {
+  color: rgba(0, 0, 0, 0.85);
+  font-size: 14px;
+}
+
+.user-info {
+  display: none;
+}
+
+.tools-panel {
+  margin-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 16px;
+}
+
+.tools-header {
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  margin-bottom: 8px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.tools-header .anticon {
+  margin-right: 8px;
+  font-size: 16px;
+}
+
+.tool-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tool-title {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>
