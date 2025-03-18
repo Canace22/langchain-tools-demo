@@ -55,6 +55,7 @@ const props = defineProps({
     default: () => ({})
   }
 });
+const emits = defineEmits(['operation']);
 
 const msg = computed(() => {
   console.log('msg', props.msg);
@@ -85,7 +86,6 @@ const isBad = ref(false);
 const showActions = ref(false);
 
 const handleOperation = (value, e) => {
-  console.log(value, e);
   if (value === 'good') {
     isGood.value = !isGood.value;
     isBad.value = false;
@@ -93,6 +93,7 @@ const handleOperation = (value, e) => {
     isBad.value = !isBad.value;
     isGood.value = false;
   }
+  emits('operation', value);
 };
 </script>
 
