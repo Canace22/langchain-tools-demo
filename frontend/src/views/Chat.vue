@@ -145,26 +145,7 @@
       </el-main>
 
       <el-footer class="chat-footer">
-        <div class="input-container">
-          <el-input
-            v-model="inputMessage"
-            type="textarea"
-            :rows="1"
-            :autosize="{ minRows: 1, maxRows: 4 }"
-            placeholder="输入消息，例如：珠海天气怎么样，按 Enter 发送，Shift + Enter 换行..."
-            @keydown.enter.prevent="sendMessage"
-            @keydown.enter.shift.prevent="newline"
-          />
-          <el-button
-            type="primary"
-            class="send-button"
-            @click="sendMessage"
-            :disabled="!inputMessage.trim() || isTyping"
-          >
-            <el-icon><Position /></el-icon>
-            发送
-          </el-button>
-        </div>
+        <chat-sender :loading="isTyping" @send="sendMessage" />
       </el-footer>
     </el-container>
   </el-container>
@@ -174,6 +155,7 @@
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue';
 import { MessagePlugin } from 'tdesign-vue-next';
 import ChatItem from '@/components/ChatItem.vue';
+import ChatSender from '@/components/ChatSender.vue';
 
 // 状态定义
 const selectedChat = ref('1');
@@ -224,22 +206,14 @@ const tools = ref([
     title: '天气查询',
     icon: 'cloud',
     description: '查询全国各地天气信息',
-    examples: [
-      '深圳天气怎么样？',
-      '北京今天天气如何？',
-      '查询上海的天气'
-    ]
+    examples: ['深圳天气怎么样？', '北京今天天气如何？', '查询上海的天气']
   },
   {
     id: 'location',
     title: '地理位置',
     icon: 'location',
     description: '查询地理位置信息',
-    examples: [
-      '珠海市在哪里？',
-      '查询广州的位置',
-      '深圳市位置在哪'
-    ]
+    examples: ['珠海市在哪里？', '查询广州的位置', '深圳市位置在哪']
   }
 ]);
 
@@ -293,16 +267,16 @@ const handleChatSelect = (value) => {
   selectedChat.value = value;
 };
 
-    const clearMessages = () => {
-      messages.value = [];
-    };
+const clearMessages = () => {
+  messages.value = [];
+};
 
-    const scrollToBottom = async () => {
-      await nextTick();
-      if (messageContainer.value) {
-        messageContainer.value.scrollTop = messageContainer.value.scrollHeight;
-      }
-    };
+const scrollToBottom = async () => {
+  await nextTick();
+  if (messageContainer.value) {
+    messageContainer.value.scrollTop = messageContainer.value.scrollHeight;
+  }
+};
 
 const getUserIP = async () => {
   try {
@@ -316,7 +290,7 @@ const getUserIP = async () => {
 };
 
 const handleToolSelect = (value) => {
-  const tool = tools.value.find(t => t.id === value);
+  const tool = tools.value.find((t) => t.id === value);
   if (tool) {
     selectTool(tool);
   }
@@ -334,46 +308,51 @@ const selectTool = (tool) => {
     {
       id: Date.now(),
       type: 'ai',
-      content: `我是${tool.title}助手，${tool.description}\n\n您可以这样问我：\n${tool.examples.map(e => `- ${e}`).join('\n')}`,
+      content: `我是${tool.title}助手，${
+        tool.description
+      }\n\n您可以这样问我：\n${tool.examples.map((e) => `- ${e}`).join('\n')}`,
       timestamp: Date.now()
     }
   ];
   selectedTool.value = tool.id;
 };
 
-    const sendMessage = async () => {
-      if (!inputMessage.value.trim() || isTyping.value) return;
+const sendMessage = async (inputMessage) => {
+  if (!inputMessage.trim() || isTyping.value) return;
 
-      const currentToolId = currentChat.value?.toolId;
-      const messageText = inputMessage.value.trim();
+  const currentToolId = currentChat.value?.toolId;
+  const messageText = inputMessage.trim();
 
-      messages.value.push({
-        id: Date.now(),
-        type: 'user',
-        content: messageText,
-        timestamp: Date.now()
-      });
+  messages.value.push({
+    id: Date.now(),
+    type: 'user',
+    content: messageText,
+    timestamp: Date.now()
+  });
 
-      inputMessage.value = '';
-      scrollToBottom();
+  inputMessage = '';
+  scrollToBottom();
 
-      isTyping.value = true;
+  isTyping.value = true;
 
   try {
-    ws.value.send(JSON.stringify({ 
-      message: messageText,
-      toolId: currentToolId
-    }));
+    ws.value.send(
+      JSON.stringify({
+        message: messageText,
+        toolId: currentToolId
+      })
+    );
   } catch (error) {
     console.error('发送消息失败:', error);
     MessagePlugin.error('发送消息失败，请重试');
+  } finally {
     isTyping.value = false;
   }
 };
 
-    const newline = () => {
-      inputMessage.value += '\n';
-    };
+const newline = () => {
+  inputMessage.value += '\n';
+};
 
 const handleUserMenuClick = (data) => {
   console.log('Menu clicked:', data);
@@ -521,7 +500,7 @@ onUnmounted(() => {
 }
 
 .message-list {
-  max-width: 800px;
+  /* max-width: 800px; */
   margin: 0 auto;
 }
 
@@ -611,6 +590,7 @@ onUnmounted(() => {
   padding: 16px 24px;
   background: #fff;
   border-top: 1px solid #f0f0f0;
+  height: 150px;
 }
 
 .input-container {
