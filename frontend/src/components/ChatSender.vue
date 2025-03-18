@@ -2,9 +2,13 @@
   <t-chat-sender
     :stop-disabled="loading"
     :textarea-props="{
-      placeholder: '输入消息，按 Enter 发送，Shift + Enter 换行......'
+      placeholder: '输入消息，按 Enter 发送，Shift + Enter 换行......',
+      maxlength: 1000,
+      showWordLimit: true,
+      height: 32
     }"
     @send="inputEnter"
+    v-bind="$attrs"
   >
     <template #suffix>
       <el-button type="primary" :loading="loading" @click="inputEnter">
@@ -13,7 +17,11 @@
     </template>
     <template #prefix>
       <div class="model-select">
-        <el-select class="model-select-dropdown" v-model="selectValue" teleported>
+        <el-select
+          class="model-select-dropdown"
+          v-model="selectValue"
+          teleported
+        >
           <el-option
             v-for="option in selectOptions"
             :key="option.value"

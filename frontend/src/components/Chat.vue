@@ -1,6 +1,6 @@
 <template>
   <el-container class="chat-container">
-    <el-header class="chat-header">
+    <el-header class="chat-header" v-if="titleVisible">
       <div class="header-content">
         <div class="header-title">{{ title }}</div>
         <div class="header-actions">
@@ -56,6 +56,10 @@ const props = defineProps({
   isTyping: {
     type: Boolean,
     default: false
+  },
+  titleVisible: {
+    type: Boolean,
+    default: true
   }
 });
 const emits = defineEmits(['operation', 'send']);

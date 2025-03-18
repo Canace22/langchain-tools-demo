@@ -1,85 +1,26 @@
 <template>
-  <el-container class="chat-layout">
-    <el-aside class="chat-sider" width="260">
-      <div class="logo">
-        <el-icon><Monitor /></el-icon>
-        <span>早安 AI</span>
-      </div>
-      <el-button type="primary" class="new-chat" @click="createNewChat">
-        <el-icon><Plus /></el-icon>
-        新建对话
-      </el-button>
-      <div class="chat-list">
-        <el-menu
-          :default-active="selectedChat[0]"
-          class="chat-menu"
-          @select="handleChatSelect"
-        >
-          <el-menu-item
-            v-for="chat in chatList"
-            :key="chat.id"
-            :index="chat.id"
-          >
-            <div class="chat-item">
-              <el-icon><ChatDotRound /></el-icon>
-              <span class="chat-title">{{ chat.title }}</span>
-              <el-icon class="delete-icon" @click.stop="deleteChat(chat.id)">
-                <Delete />
-              </el-icon>
-            </div>
-          </el-menu-item>
-        </el-menu>
-      </div>
-
-      <!-- 工具面板 -->
-      <div class="tools-panel">
-        <div class="tools-header">
-          <el-icon><Tools /></el-icon>
-          <span>工具箱</span>
-        </div>
-        <el-menu
-          :default-active="selectedTool[0]"
-          class="tools-menu"
-          @select="handleToolSelect"
-        >
-          <el-menu-item v-for="tool in tools" :key="tool.id" :index="tool.id">
-            <div class="tool-item">
-              <el-icon><component :is="tool.icon" /></el-icon>
-              <span class="tool-title">{{ tool.title }}</span>
-            </div>
-          </el-menu-item>
-        </el-menu>
-      </div>
-    </el-aside>
-    <Chat
-      :messages="messages"
-      :title="currentChat?.title"
-      :is-typing="isTyping"
-      @send="sendMessage"
-      @operation="handleOperation"
+  <div>
+    <el-button @click="dialogVisible = true">AI 对话</el-button>
+    <el-dialog
+      v-model="dialogVisible"
+      title="AI 对话"
+      width="50%"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      @close="dialogVisible = false"
     >
-      <template #header-actions>
-        <el-dropdown>
-          <div class="user-dropdown">
-              <el-avatar :size="32" :icon="User" />
-              <span class="username">User</span>
-            </div>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item>
-                  <el-icon><Setting /></el-icon>
-                  设置
-                </el-dropdown-item>
-                <el-dropdown-item>
-                  <el-icon><SwitchButton /></el-icon>
-                  退出
-                </el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
-      </template>
-    </Chat>
-  </el-container>
+      <div class="chat-container">
+      <Chat
+        :messages="messages"
+        :is-typing="isTyping"
+        :title-visible="false"
+        @send="sendMessage"
+        @operation="handleOperation"
+      >
+      </Chat>
+    </div>
+    </el-dialog>
+  </div>
 </template>
 
 <script setup>
@@ -94,6 +35,7 @@ const messageContainer = ref(null);
 const ws = ref(null);
 const userIP = ref('获取中...');
 const selectedTool = ref('');
+const dialogVisible = ref(false);
 
 // 聊天列表
 const chatList = ref([
@@ -339,156 +281,7 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.chat-layout {
-  height: 100vh;
-}
-
-.chat-sider {
-  background: #1e1e1e;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  width: 260px;
-}
-
-.logo {
-  height: 64px;
-  padding: 16px;
-  display: flex;
-  align-items: center;
-  color: white;
-  font-size: 18px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.logo .el-icon {
-  font-size: 24px;
-  margin-right: 8px;
-}
-
-.new-chat {
-  margin: 16px;
-  width: calc(100% - 32px);
-}
-
-.chat-list {
-  flex: 1;
-  overflow-y: auto;
-}
-
-.chat-menu {
-  border-right: none;
-  background-color: transparent;
-}
-
-.chat-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding-right: 8px;
-}
-
-.chat-title {
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.delete-icon {
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.chat-item:hover .delete-icon {
-  opacity: 1;
-}
-
-.input-container {
-  max-width: 800px;
-  margin: 0 auto;
-  display: flex;
-  gap: 16px;
-}
-
-.send-button {
-  flex-shrink: 0;
-  height: auto;
-}
-
-.user-dropdown {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 4px;
-  transition: background-color 0.2s;
-}
-
-.user-dropdown:hover {
-  background-color: rgba(0, 0, 0, 0.04);
-}
-
-.username {
-  color: rgba(0, 0, 0, 0.85);
-  font-size: 14px;
-}
-
-.tools-panel {
-  margin-top: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding-top: 16px;
-}
-
-.tools-header {
-  display: flex;
-  align-items: center;
-  padding: 0 24px;
-  margin-bottom: 8px;
-  color: rgba(255, 255, 255, 0.85);
-}
-
-.tools-header .el-icon {
-  margin-right: 8px;
-  font-size: 16px;
-}
-
-.tools-menu {
-  border-right: none;
-  background-color: transparent;
-}
-
-.tool-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.tool-title {
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-:deep(.el-menu) {
-  background-color: transparent;
-}
-
-:deep(.el-menu-item) {
-  color: rgba(255, 255, 255, 0.65);
-}
-
-:deep(.el-menu-item.is-active) {
-  color: #409eff;
-}
-
-:deep(.el-menu-item:hover) {
-  color: #409eff;
-}
-
-:deep(.el-menu-item .el-icon) {
-  color: inherit;
+.chat-container {
+  height: 60%;
 }
 </style>
