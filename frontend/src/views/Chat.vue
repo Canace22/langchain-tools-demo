@@ -178,7 +178,8 @@ const messages = ref([
     id: 1,
     type: 'ai',
     content: '你好，我能为你做些什么？',
-    timestamp: Date.now() - 1000
+    timestamp: Date.now() - 1000,
+    showActions: false
   },
   {
     id: 2,
@@ -311,7 +312,8 @@ const selectTool = (tool) => {
       content: `我是${tool.title}助手，${
         tool.description
       }\n\n您可以这样问我：\n${tool.examples.map((e) => `- ${e}`).join('\n')}`,
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      showActions: true
     }
   ];
   selectedTool.value = tool.id;
@@ -375,7 +377,8 @@ const setupWebSocket = () => {
         id: messages.value.length + 1,
         type: 'ai',
         content: data.response,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        showActions: true
       });
       scrollToBottom();
     }
