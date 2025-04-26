@@ -50,14 +50,16 @@ const messages = ref([
     type: 'ai',
     content: '你好，我能为你做些什么？',
     timestamp: Date.now() - 1000,
-    showActions: false
+    showActions: false,
+    showAvatar: true
   },
-  {
-    id: 2,
-    type: 'user',
-    content: '珠海今天天气怎么样？',
-    timestamp: Date.now() - 1000
-  }
+  // {
+  //   id: 2,
+  //   type: 'user',
+  //   content: '珠海今天天气怎么样？',
+  //   timestamp: Date.now() - 1000,
+  //   showAvatar: false
+  // }
 ]);
 
 // 工具列表

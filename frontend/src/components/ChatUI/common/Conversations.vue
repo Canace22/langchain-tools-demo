@@ -2,11 +2,11 @@
   <div class="conversations-container">
     <div class="conversations-messages" ref="messagesContainer">
       <div v-for="(message, index) in messages" :key="index" class="message-wrapper" :class="{ 'user-message': message.isUser }">
-        <el-avatar :class="['avatar', message.isUser ? 'user-avatar' : 'ai-avatar']">
+        <el-avatar v-if="!message.isUser || showUserAvatar" :class="['avatar', message.isUser ? 'user-avatar' : 'ai-avatar']">
           <el-icon v-if="!message.isUser"><Monitor /></el-icon>
           <el-icon v-else><User /></el-icon>
         </el-avatar>
-        <div class="message-content">
+        <div class="message-content" :class="{ 'user-no-avatar': message.isUser && !showUserAvatar }">
           <div class="message-header">
             <span class="sender-name">{{ message.isUser ? 'You' : 'AI Assistant' }}</span>
             <span class="message-time">{{ formatTime(message.timestamp) }}</span>
@@ -51,7 +51,7 @@
 </template>
 
 <script setup>
-import { ref, watch, nextTick } from 'vue';
+import { ref, watch, nextTick ,computed} from 'vue';
 import { Document, Top, Bottom, Monitor, User } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
 import Bubble from './Bubble.vue';
@@ -68,10 +68,21 @@ const props = defineProps({
   showActions: {
     type: Boolean,
     default: true
+  },
+  showUserAvatar: {
+    type: Boolean,
+    default: true
   }
 });
 
 const messagesContainer = ref(null);
+
+const messages = computed(() => {
+  return props.messages?.map(message => ({
+    ...message,
+    isUser: message.role === 'user'||message.type === 'user'
+  }));
+});
 
 // Automatically scroll to bottom when messages change
 watch(() => props.messages.length, async () => {
@@ -213,5 +224,10 @@ defineEmits(['thumbsUp', 'thumbsDown']);
   50% {
     transform: translateY(-4px);
   }
+}
+
+.user-no-avatar {
+  max-width: 85%;
+  margin-left: auto;
 }
 </style> 

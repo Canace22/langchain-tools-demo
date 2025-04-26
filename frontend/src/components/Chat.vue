@@ -11,14 +11,12 @@
 
     <el-main class="chat-content" ref="messageContainer">
       <div class="message-list">
-        <t-space direction="vertical">
-          <chat-item
-            v-for="msg in messages"
-            :key="msg.id"
-            :msg="msg"
-            @operation="(val) => emits('operation', val)"
-          />
-        </t-space>
+        <conversations 
+          :messages="messages"
+          :show-user-avatar="false"
+          @operation="(val) => emits('operation', val)"
+        />
+        
         <div v-if="isTyping" class="message ai">
           <div class="avatar">
             <el-avatar :size="40" style="background-color: #409eff">
@@ -35,14 +33,14 @@
     </el-main>
 
     <el-footer class="chat-footer">
-      <chat-sender :loading="isTyping" @send="(val) => emits('send', val)" />
+      <sender :loading="isTyping" @send="(val) => emits('send', val)" />
     </el-footer>
   </el-container>
 </template>
 
 <script setup>
-import ChatItem from '@/components/ChatItem.vue';
-import ChatSender from '@/components/ChatSender.vue';
+import { Conversations, Sender } from '@/components/ChatUI';
+import { Monitor } from '@element-plus/icons-vue';
 
 const props = defineProps({
   title: {

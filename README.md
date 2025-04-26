@@ -16,6 +16,7 @@ The project includes a recreation of Ant Design X components using Element Plus:
 #### Common Components
 - **Bubble**: Versatile message bubble component with multiple styling options and tail positioning
 - **Conversations**: Complete conversation component with support for user/AI messages, typing indicators, and action buttons
+  - Now supports hiding user avatars while keeping AI avatars visible for a cleaner interface
 
 #### Wake Components
 - **Welcome**: Customizable welcome screen component with title, description, icon/image, and example suggestions
@@ -28,6 +29,12 @@ The project includes a recreation of Ant Design X components using Element Plus:
 - **ThoughtChain**: Component for displaying AI reasoning process with collapsible steps and code snippets
 
 To view the demos, navigate to `/antx-demo` in the application.
+
+## Recent Updates
+- Replaced custom chat components with Ant Design X (AntX) components in the Chat.vue file
+- Integrated AntxConversations for message display and AntxSender for message input
+- Improved chat UI with standardized components for better user experience
+- Added option to show only AI avatars in chat conversations for a cleaner interface
 
 ## Getting Started
 
