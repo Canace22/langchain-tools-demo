@@ -17,6 +17,7 @@ The project includes a recreation of Ant Design X components using Element Plus:
 - **Bubble**: Versatile message bubble component with multiple styling options and tail positioning
 - **Conversations**: Complete conversation component with support for user/AI messages, typing indicators, and action buttons
   - Now supports hiding user avatars while keeping AI avatars visible for a cleaner interface
+  - Added Markdown rendering with syntax highlighting for code blocks in AI messages
 
 #### Wake Components
 - **Welcome**: Customizable welcome screen component with title, description, icon/image, and example suggestions
@@ -24,6 +25,8 @@ The project includes a recreation of Ant Design X components using Element Plus:
 
 #### Express Components
 - **Sender**: Message input component with support for text entry, uploads, and keyboard shortcuts
+  - Uses Enter to send messages and Shift+Enter for line breaks
+  - Provides visual feedback for loading states and character limits
 
 #### Confirm Components
 - **ThoughtChain**: Component for displaying AI reasoning process with collapsible steps and code snippets
@@ -35,6 +38,8 @@ To view the demos, navigate to `/antx-demo` in the application.
 - Integrated AntxConversations for message display and AntxSender for message input
 - Improved chat UI with standardized components for better user experience
 - Added option to show only AI avatars in chat conversations for a cleaner interface
+- Updated keyboard shortcuts in the Sender component: now uses Enter to send messages and Shift+Enter for line breaks
+- Added Markdown rendering support with syntax highlighting for AI messages in conversations
 
 ## Getting Started
 

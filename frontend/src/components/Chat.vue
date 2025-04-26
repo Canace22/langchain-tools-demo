@@ -14,6 +14,7 @@
         <conversations 
           :messages="messages"
           :show-user-avatar="false"
+          :enable-markdown="true"
           @operation="(val) => emits('operation', val)"
         />
         

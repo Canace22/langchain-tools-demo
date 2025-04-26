@@ -11,7 +11,7 @@
         :placeholder="placeholder"
         resize="none"
         @input="handleInput"
-        @keydown.enter.ctrl.prevent="handleSend"
+        @keydown.enter="handleKeyDown"
         ref="textareaRef"
       />
     </div>
@@ -49,7 +49,7 @@
 
     <div class="sender-hints" v-if="showHints">
       <div class="sender-hint">
-        Press <kbd>Ctrl</kbd> + <kbd>Enter</kbd> to send
+        Press <kbd>Enter</kbd> to send, <kbd>Shift</kbd> + <kbd>Enter</kbd> for new line
       </div>
     </div>
   </div>
@@ -122,6 +122,17 @@ const isButtonDisabled = computed(() => {
 
 const handleInput = (value) => {
   emit('update:modelValue', value);
+};
+
+const handleKeyDown = (event) => {
+  // If Shift+Enter pressed, allow default behavior (new line)
+  if (event.shiftKey) {
+    return;
+  }
+  
+  // If Enter pressed without Shift, send message
+  event.preventDefault();
+  handleSend();
 };
 
 const handleSend = () => {
