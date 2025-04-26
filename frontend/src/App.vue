@@ -1,13 +1,24 @@
 <template>
-  <router-view></router-view>
+  <div class="app-container">
+    <!-- <header class="app-header">
+      <div class="logo">
+        <el-icon><Monitor /></el-icon>
+        <span>AI Components</span>
+      </div>
+      <div class="nav">
+        <router-link to="/">Home</router-link>
+        <router-link to="/use-chat">Chat</router-link>
+        <router-link to="/antx-demo">AntX Demo</router-link>
+      </div>
+    </header> -->
+    <main class="app-content">
+      <router-view />
+    </main>
+  </div>
 </template>
 
-<script>
-import { defineComponent } from 'vue'
-
-export default defineComponent({
-  name: 'App'
-})
+<script setup>
+import { Monitor } from '@element-plus/icons-vue';
 </script>
 
 <style>
@@ -50,5 +61,57 @@ html, body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 24px;
+  height: 64px;
+  background-color: #fff;
+  border-bottom: 1px solid #f0f0f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  font-weight: 500;
+  color: #409EFF;
+}
+
+.logo .el-icon {
+  margin-right: 8px;
+  font-size: 24px;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.nav a {
+  color: #606266;
+  text-decoration: none;
+  font-size: 16px;
+  transition: color 0.3s;
+}
+
+.nav a:hover, .nav a.router-link-active {
+  color: #409EFF;
+}
+
+.app-content {
+  flex: 1;
+  overflow: auto;
 }
 </style>

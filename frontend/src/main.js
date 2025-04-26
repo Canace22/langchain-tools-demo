@@ -5,13 +5,13 @@ import 'element-plus/dist/index.css'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import App from './App.vue'
 import router from './router'
-import TDesignChat from '@tdesign-vue-next/chat';
+import ChatUIComponents from './components/ChatUI';
 
 const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
-app.use(TDesignChat)
+app.use(ChatUIComponents)
 
 // 注册所有图标
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {

@@ -10,6 +10,25 @@ langchain tools demo
 - Detailed view for individual responses
 - Real-time status monitoring with visual indicators
 
+### Ant Design X Components (Element Plus Implementation)
+The project includes a recreation of Ant Design X components using Element Plus:
+
+#### Common Components
+- **Bubble**: Versatile message bubble component with multiple styling options and tail positioning
+- **Conversations**: Complete conversation component with support for user/AI messages, typing indicators, and action buttons
+
+#### Wake Components
+- **Welcome**: Customizable welcome screen component with title, description, icon/image, and example suggestions
+- **Prompts**: Grid display of prompt templates with selection capability and visual feedback
+
+#### Express Components
+- **Sender**: Message input component with support for text entry, uploads, and keyboard shortcuts
+
+#### Confirm Components
+- **ThoughtChain**: Component for displaying AI reasoning process with collapsible steps and code snippets
+
+To view the demos, navigate to `/antx-demo` in the application.
+
 ## Getting Started
 
 1. Clone the repository
