@@ -21,7 +21,8 @@ The project includes a recreation of Ant Design X components using Element Plus:
 
 #### Wake Components
 - **Welcome**: Customizable welcome screen component with title, description, icon/image, and example suggestions
-- **Prompts**: Grid display of prompt templates with selection capability and visual feedback
+  - Redesigned with a modern horizontal layout matching Ant Design X visual style
+  - Supports custom avatar/logo display and personalized welcome message
 
 #### Express Components
 - **Sender**: Message input component with support for text entry, uploads, and keyboard shortcuts
@@ -40,6 +41,7 @@ To view the demos, navigate to `/antx-demo` in the application.
 - Added option to show only AI avatars in chat conversations for a cleaner interface
 - Updated keyboard shortcuts in the Sender component: now uses Enter to send messages and Shift+Enter for line breaks
 - Added Markdown rendering support with syntax highlighting for AI messages in conversations
+- Redesigned the Welcome component with Ant Design X branding and improved layout
 
 ## Getting Started
 
@@ -78,3 +80,46 @@ These scripts will:
 - The frontend will be available at http://localhost:5173
 - The backend API at http://localhost:3000
 - The MCP service at http://localhost:3001
+
+# 早安 AI Chat Application
+
+A modern AI chat application built with Vue.js and Element Plus.
+
+## Recent Updates
+
+- **Welcome Screen Integration**: Added welcome screen using the `Welcome.vue` component that displays when chat is empty
+- **Example Messages**: Users can now select example messages to quickly start a conversation
+- **Improved Chat UI**: Chat interface now shows welcome screen on new chats
+
+## Features
+
+- Modern chat interface with ElementUI components
+- Tool integration for various functions (weather, images, location)
+- WebSocket communication for real-time chat
+- Welcome screen with example prompts
+- Multiple chat support
+
+## Components
+
+- **Chat.vue**: Main chat component with message display
+- **Welcome.vue**: Welcome screen component with examples
+- **Home.vue**: Main application layout and state management
+
+## Getting Started
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+
+## Usage
+
+The application provides a chat interface with AI capabilities. Users can:
+
+1. Create new chats
+2. Select from predefined examples
+3. Send custom messages
+4. Use integrated tools

@@ -10,14 +10,15 @@
     </el-header>
 
     <el-main class="chat-content" ref="messageContainer">
-      <div class="message-list">
-        <conversations 
+      <slot name="empty" v-if="messages.length === 0"></slot>
+      <div class="message-list" v-else>
+        <conversations
           :messages="messages"
           :show-user-avatar="false"
           :enable-markdown="true"
           @operation="(val) => emits('operation', val)"
         />
-        
+
         <div v-if="isTyping" class="message ai">
           <div class="avatar">
             <el-avatar :size="40" style="background-color: #409eff">
@@ -34,12 +35,13 @@
     </el-main>
 
     <el-footer class="chat-footer">
-      <sender :loading="isTyping" @send="(val) => emits('send', val)" />
+      <sender :loading="isTyping" v-model="inputMessage" @send="handleSend" />
     </el-footer>
   </el-container>
 </template>
 
 <script setup>
+import { ref } from 'vue';
 import { Conversations, Sender } from '@/components/ChatUI';
 import { Monitor } from '@element-plus/icons-vue';
 
@@ -62,6 +64,16 @@ const props = defineProps({
   }
 });
 const emits = defineEmits(['operation', 'send']);
+
+const inputMessage = ref('');
+const handleSelectPrompt = (prompt) => {
+  console.log(prompt);
+  inputMessage.value = prompt;
+};
+
+const handleSend = (val) => {
+  emits('send', val);
+};
 </script>
 
 <style scoped>

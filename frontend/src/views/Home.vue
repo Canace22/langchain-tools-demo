@@ -61,22 +61,31 @@
       <template #header-actions>
         <el-dropdown>
           <div class="user-dropdown">
-              <el-avatar :size="32" :icon="User" />
-              <span class="username">User</span>
-            </div>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item>
-                  <el-icon><Setting /></el-icon>
-                  设置
-                </el-dropdown-item>
-                <el-dropdown-item>
-                  <el-icon><SwitchButton /></el-icon>
-                  退出
-                </el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
+            <el-avatar :size="32" :icon="User" />
+            <span class="username">User</span>
+          </div>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item>
+                <el-icon><Setting /></el-icon>
+                设置
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <el-icon><SwitchButton /></el-icon>
+                退出
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </template>
+      <template #empty v-if="showWelcome">
+        <Welcome
+          title="你好，我是早安 AI"
+          description="我可以回答你的问题，帮助你完成各种任务。"
+          icon="ChatRound"
+          :examples="welcomeExamples"
+          @select="handleExampleSelect"
+        />
       </template>
     </Chat>
   </el-container>
@@ -85,6 +94,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue';
 import Chat from '@/components/Chat.vue';
+import Welcome from '@/components/ChatUI/wake/Welcome.vue';
 
 // 状态定义
 const selectedChat = ref('1');
@@ -94,6 +104,7 @@ const messageContainer = ref(null);
 const ws = ref(null);
 const userIP = ref('获取中...');
 const selectedTool = ref('');
+const showWelcome = ref(true);
 
 // 聊天列表
 const chatList = ref([
@@ -101,22 +112,21 @@ const chatList = ref([
   { id: '2', title: '新对话 2' }
 ]);
 
-// 消息列表
-const messages = ref([
-  {
-    id: 1,
-    type: 'ai',
-    content: '你好，我能为你做些什么？',
-    timestamp: Date.now() - 1000,
-    showActions: false
-  },
-  {
-    id: 2,
-    type: 'user',
-    content: '珠海今天天气怎么样？',
-    timestamp: Date.now() - 1000
-  }
+// 欢迎示例内容
+const welcomeExamples = ref([
+  '珠海今天天气怎么样？',
+  '介绍一下深圳的景点',
+  '如何学习人工智能？'
 ]);
+
+// 消息列表
+const messages = ref([]);
+
+// 示例回答内容
+const exampleResponses = {
+  '珠海今天天气怎么样？':
+    '珠海今天天气晴朗，气温22-28℃，空气质量良好，适合户外活动。'
+};
 
 // 工具列表
 const tools = ref([
@@ -181,6 +191,20 @@ const createNewChat = () => {
   });
   selectedChat.value = newId;
   messages.value = [];
+  showWelcome.value = true;
+};
+
+const handleExampleSelect = (example) => {
+  showWelcome.value = false;
+
+  // 添加用户消息
+  messages.value.push({
+    id: Date.now(),
+    type: 'user',
+    content: example,
+    timestamp: Date.now()
+  });
+  sendMessage(example);
 };
 
 const deleteChat = (id) => {
@@ -189,16 +213,19 @@ const deleteChat = (id) => {
     chatList.value.splice(index, 1);
     if (selectedChat.value === id) {
       selectedChat.value = chatList.value.length ? chatList.value[0].id : '';
+      showWelcome.value = true;
     }
   }
 };
 
 const handleChatSelect = (value) => {
   selectedChat.value = value;
+  showWelcome.value = true;
 };
 
 const clearMessages = () => {
   messages.value = [];
+  showWelcome.value = true;
 };
 
 const scrollToBottom = async () => {
@@ -251,6 +278,7 @@ const selectTool = (tool) => {
 const sendMessage = async (inputMessage) => {
   if (!inputMessage.trim() || isTyping.value) return;
 
+  showWelcome.value = false;
   const currentToolId = currentChat.value?.toolId;
   const messageText = inputMessage.trim();
 
