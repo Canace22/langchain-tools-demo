@@ -13,6 +13,7 @@
         @input="handleInput"
         @keydown.enter="handleKeyDown"
         ref="textareaRef"
+        class="borderless-input"
       />
     </div>
 
@@ -38,18 +39,10 @@
             :loading="loading"
             :disabled="isButtonDisabled"
             @click="handleSend"
-            round
           >
             <span>{{ sendButtonText }}</span>
-            <el-icon class="el-icon--right"><ChatRound /></el-icon>
           </el-button>
         </slot>
-      </div>
-    </div>
-
-    <div class="sender-hints" v-if="showHints">
-      <div class="sender-hint">
-        Press <kbd>Enter</kbd> to send, <kbd>Shift</kbd> + <kbd>Enter</kbd> for new line
       </div>
     </div>
   </div>
@@ -66,11 +59,11 @@ const props = defineProps({
   },
   placeholder: {
     type: String,
-    default: 'Type a message...'
+    default: 'shift+enter换行，enter发送'
   },
   sendButtonText: {
     type: String,
-    default: 'Send'
+    default: '发送'
   },
   loading: {
     type: Boolean,
@@ -90,7 +83,7 @@ const props = defineProps({
   },
   showWordLimit: {
     type: Boolean,
-    default: true
+    default: false
   },
   showHints: {
     type: Boolean,
@@ -180,7 +173,7 @@ const handleSend = () => {
 
 .sender-toolbar {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
 }
 
@@ -203,6 +196,17 @@ const handleSend = () => {
 .sender-hint {
   font-size: 12px;
   color: #909399;
+}
+
+.borderless-input :deep(.el-textarea__inner) {
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+.borderless-input :deep(.el-textarea__inner:focus) {
+  box-shadow: none;
+  outline: none;
 }
 
 kbd {
