@@ -74,6 +74,10 @@
                 <el-icon><SwitchButton /></el-icon>
                 退出
               </el-dropdown-item>
+              <el-dropdown-item @click="clearAllChatData">
+                <el-icon><Delete /></el-icon>
+                清除所有数据
+              </el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
@@ -92,9 +96,10 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, nextTick, reactive } from 'vue';
+import { ref, computed, onMounted, onUnmounted, nextTick, reactive, watch } from 'vue';
 import Chat from '@/components/Chat.vue';
 import Welcome from '@/components/ChatUI/wake/Welcome.vue';
+import { Plus, Monitor, ChatDotRound, Tools, User, Setting, SwitchButton, Delete } from '@element-plus/icons-vue';
 
 // 状态定义
 const selectedChat = ref('1');
@@ -190,6 +195,7 @@ const createNewChat = () => {
   }
   messages.value = messagesList[newId];
   showWelcome.value = true;
+  saveToLocalStorage();
 };
 
 const handleExampleSelect = (example) => {
@@ -208,6 +214,7 @@ const deleteChat = (id) => {
       messages.value = selectedChat.value ? messagesList[selectedChat.value] || [] : [];
       showWelcome.value = messages.value.length === 0;
     }
+    saveToLocalStorage();
   }
 };
 
@@ -358,19 +365,67 @@ const setupWebSocket = () => {
   ws.value = wsClient;
 };
 
+// 保存数据到localStorage
+const saveToLocalStorage = () => {
+  try {
+    localStorage.setItem('chatList', JSON.stringify(chatList.value));
+    localStorage.setItem('messagesList', JSON.stringify(messagesList));
+    localStorage.setItem('selectedChat', selectedChat.value);
+  } catch (error) {
+    console.error('保存到localStorage失败:', error);
+  }
+};
+
+// 从localStorage加载数据
+const loadFromLocalStorage = () => {
+  try {
+    const savedChatList = localStorage.getItem('chatList');
+    const savedMessagesList = localStorage.getItem('messagesList');
+    const savedSelectedChat = localStorage.getItem('selectedChat');
+    
+    if (savedChatList) {
+      chatList.value = JSON.parse(savedChatList);
+    }
+    
+    if (savedMessagesList) {
+      const parsedMessages = JSON.parse(savedMessagesList);
+      Object.keys(parsedMessages).forEach(key => {
+        messagesList[key] = parsedMessages[key];
+      });
+    }
+    
+    if (savedSelectedChat) {
+      selectedChat.value = savedSelectedChat;
+    }
+  } catch (error) {
+    console.error('从localStorage加载失败:', error);
+  }
+};
+
+// 监听变化并保存
+watch(chatList, saveToLocalStorage, { deep: true });
+watch(messagesList, saveToLocalStorage, { deep: true });
+watch(selectedChat, saveToLocalStorage);
+
 // 生命周期钩子
 onMounted(() => {
+  // 先从localStorage加载数据
+  loadFromLocalStorage();
+  
   setupWebSocket();
   getUserIP();
   
+  // 初始化每个聊天的消息列表
   chatList.value.forEach(chat => {
     if (!messagesList[chat.id]) {
       messagesList[chat.id] = [];
     }
   });
   
+  // 初始化当前选中聊天的消息
   if (selectedChat.value) {
     messages.value = messagesList[selectedChat.value] || [];
+    showWelcome.value = messages.value.length === 0;
   }
 });
 
@@ -379,6 +434,23 @@ onUnmounted(() => {
     ws.value.close();
   }
 });
+
+// 增加清除所有会话数据的方法
+const clearAllChatData = () => {
+  try {
+    localStorage.removeItem('chatList');
+    localStorage.removeItem('messagesList');
+    localStorage.removeItem('selectedChat');
+    
+    chatList.value = [{ id: '1', title: '新对话 1' }];
+    Object.keys(messagesList).forEach(key => delete messagesList[key]);
+    selectedChat.value = '1';
+    messages.value = [];
+    showWelcome.value = true;
+  } catch (error) {
+    console.error('清除数据失败:', error);
+  }
+};
 </script>
 
 <style scoped>

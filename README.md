@@ -1,66 +1,48 @@
-# langchain-tools-demo
-langchain tools demo
+# 早安 AI
 
-## Features
+一个基于Vue 3的智能聊天助手应用，提供多对话支持和工具集成。
 
-### Response Analysis Page
-- View comprehensive response statistics including total responses, average response time, and success rate
-- Interactive data table with filtering and pagination
-- Export functionality for response data
-- Detailed view for individual responses
-- Real-time status monitoring with visual indicators
+## 功能
 
-### Ant Design X Components (Element Plus Implementation)
-The project includes a recreation of Ant Design X components using Element Plus:
+- 多对话管理：支持创建和管理多个独立对话
+- 对话缓存：切换对话时自动保存和恢复聊天记录
+- 本地存储：将对话历史保存到localStorage，浏览器关闭后数据不丢失
+- 工具集成：支持图片处理、天气查询、地理位置等多种工具
+- Markdown支持：AI回复支持Markdown格式化
+- WebSocket通信：实时消息传输
 
-#### Common Components
-- **Bubble**: Versatile message bubble component with multiple styling options and tail positioning
-- **Conversations**: Complete conversation component with support for user/AI messages, typing indicators, and action buttons
-  - Now supports hiding user avatars while keeping AI avatars visible for a cleaner interface
-  - Added Markdown rendering with syntax highlighting for code blocks in AI messages
+## 技术栈
 
-#### Wake Components
-- **Welcome**: Customizable welcome screen component with title, description, icon/image, and example suggestions
-  - Redesigned with a modern horizontal layout matching Ant Design X visual style
-  - Supports custom avatar/logo display and personalized welcome message
+- Vue 3 组合式API
+- Element Plus UI组件库
+- WebSocket实时通信
+- 响应式设计
+- localStorage数据持久化
 
-#### Express Components
-- **Sender**: Message input component with support for text entry, uploads, and keyboard shortcuts
-  - Uses Enter to send messages and Shift+Enter for line breaks
-  - Provides visual feedback for loading states and character limits
+## 使用方法
 
-#### Confirm Components
-- **ThoughtChain**: Component for displaying AI reasoning process with collapsible steps and code snippets
+1. 创建新对话：点击"新建对话"按钮
+2. 切换对话：在左侧对话列表中选择需要的对话
+3. 使用工具：在左侧工具箱中选择需要的工具
+4. 发送消息：在底部输入框中输入消息后按Enter或点击发送按钮
+5. 清除数据：点击右上角用户头像 → 清除所有数据
 
-To view the demos, navigate to `/antx-demo` in the application.
+## 数据持久化
 
-## Recent Updates
-- Replaced custom chat components with Ant Design X (AntX) components in the Chat.vue file
-- Integrated AntxConversations for message display and AntxSender for message input
-- Improved chat UI with standardized components for better user experience
-- Added option to show only AI avatars in chat conversations for a cleaner interface
-- Updated keyboard shortcuts in the Sender component: now uses Enter to send messages and Shift+Enter for line breaks
-- Added Markdown rendering support with syntax highlighting for AI messages in conversations
-- Redesigned the Welcome component with Ant Design X branding and improved layout
+应用使用localStorage实现了以下数据的持久化存储：
 
-## Getting Started
+- 对话列表：保存所有创建的对话信息
+- 消息历史：每个对话的完整聊天记录
+- 当前选择：记住最后选择的对话
 
-1. Clone the repository
-2. Install dependencies:
-   ```bash
-   cd frontend
-   npm install
-   ```
-3. Run the development server:
-   ```bash
-   npm run dev
-   ```
+数据在以下情况下会自动保存：
+- 创建新对话时
+- 删除对话时
+- 对话内容变化时
+- 切换对话时
 
-## Quick Start
+## 开发
 
-For your convenience, we've provided scripts to start both frontend and backend services with a single command:
-
-### On macOS/Linux:
 ```bash
 # Make the script executable first
 chmod +x start.sh
