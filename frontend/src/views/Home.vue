@@ -23,9 +23,9 @@
             <div class="chat-item">
               <el-icon><ChatDotRound /></el-icon>
               <span class="chat-title">{{ chat.title }}</span>
-              <el-icon class="delete-icon" @click.stop="deleteChat(chat.id)">
+              <!-- <el-icon class="delete-icon" @click.stop="deleteChat(chat.id)">
                 <Delete />
-              </el-icon>
+              </el-icon> -->
             </div>
           </el-menu-item>
         </el-menu>
@@ -92,7 +92,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue';
+import { ref, computed, onMounted, onUnmounted, nextTick, reactive } from 'vue';
 import Chat from '@/components/Chat.vue';
 import Welcome from '@/components/ChatUI/wake/Welcome.vue';
 
@@ -121,12 +121,7 @@ const welcomeExamples = ref([
 
 // 消息列表
 const messages = ref([]);
-
-// 示例回答内容
-const exampleResponses = {
-  '珠海今天天气怎么样？':
-    '珠海今天天气晴朗，气温22-28℃，空气质量良好，适合户外活动。'
-};
+const messagesList = reactive({});
 
 // 工具列表
 const tools = ref([
@@ -190,20 +185,16 @@ const createNewChat = () => {
     title: `新对话 ${newId}`
   });
   selectedChat.value = newId;
-  messages.value = [];
+  if (!messagesList[newId]) {
+    messagesList[newId] = [];
+  }
+  messages.value = messagesList[newId];
   showWelcome.value = true;
 };
 
 const handleExampleSelect = (example) => {
   showWelcome.value = false;
 
-  // 添加用户消息
-  messages.value.push({
-    id: Date.now(),
-    type: 'user',
-    content: example,
-    timestamp: Date.now()
-  });
   sendMessage(example);
 };
 
@@ -211,16 +202,22 @@ const deleteChat = (id) => {
   const index = chatList.value.findIndex((chat) => chat.id === id);
   if (index > -1) {
     chatList.value.splice(index, 1);
+    delete messagesList[id];
     if (selectedChat.value === id) {
       selectedChat.value = chatList.value.length ? chatList.value[0].id : '';
-      showWelcome.value = true;
+      messages.value = selectedChat.value ? messagesList[selectedChat.value] || [] : [];
+      showWelcome.value = messages.value.length === 0;
     }
   }
 };
 
 const handleChatSelect = (value) => {
   selectedChat.value = value;
-  showWelcome.value = true;
+  if (!messagesList[value]) {
+    messagesList[value] = [];
+  }
+  messages.value = messagesList[value];
+  showWelcome.value = messages.value.length === 0;
 };
 
 const clearMessages = () => {
@@ -282,12 +279,18 @@ const sendMessage = async (inputMessage) => {
   const currentToolId = currentChat.value?.toolId;
   const messageText = inputMessage.trim();
 
-  messages.value.push({
+  const newMessage = {
     id: Date.now(),
     type: 'user',
     content: messageText,
     timestamp: Date.now()
-  });
+  };
+  
+  messages.value.push(newMessage);
+  if (!messagesList[selectedChat.value]) {
+    messagesList[selectedChat.value] = [];
+  }
+  messagesList[selectedChat.value] = messages.value;
 
   inputMessage = '';
   scrollToBottom();
@@ -334,13 +337,15 @@ const setupWebSocket = () => {
     if (data.error) {
       MessagePlugin.error(data.error);
     } else {
-      messages.value.push({
+      const aiMessage = {
         id: messages.value.length + 1,
         type: 'ai',
         content: data.response,
         timestamp: Date.now(),
         showActions: true
-      });
+      };
+      messages.value.push(aiMessage);
+      messagesList[selectedChat.value] = messages.value;
       scrollToBottom();
     }
   };
@@ -357,6 +362,16 @@ const setupWebSocket = () => {
 onMounted(() => {
   setupWebSocket();
   getUserIP();
+  
+  chatList.value.forEach(chat => {
+    if (!messagesList[chat.id]) {
+      messagesList[chat.id] = [];
+    }
+  });
+  
+  if (selectedChat.value) {
+    messages.value = messagesList[selectedChat.value] || [];
+  }
 });
 
 onUnmounted(() => {

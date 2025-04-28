@@ -1,16 +1,5 @@
 <template>
   <div class="app-container">
-    <!-- <header class="app-header">
-      <div class="logo">
-        <el-icon><Monitor /></el-icon>
-        <span>AI Components</span>
-      </div>
-      <div class="nav">
-        <router-link to="/">Home</router-link>
-        <router-link to="/use-chat">Chat</router-link>
-        <router-link to="/antx-demo">AntX Demo</router-link>
-      </div>
-    </header> -->
     <main class="app-content">
       <router-view />
     </main>
@@ -18,7 +7,6 @@
 </template>
 
 <script setup>
-import { Monitor } from '@element-plus/icons-vue';
 </script>
 
 <style>
