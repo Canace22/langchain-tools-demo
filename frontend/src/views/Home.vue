@@ -2,7 +2,6 @@
   <el-container class="chat-layout">
     <el-aside class="chat-sider" width="260">
       <div class="logo">
-        <el-icon><Monitor /></el-icon>
         <span>早安 AI</span>
       </div>
       <el-button type="primary" class="new-chat" @click="createNewChat">
@@ -23,9 +22,9 @@
             <div class="chat-item">
               <el-icon><ChatDotRound /></el-icon>
               <span class="chat-title">{{ chat.title }}</span>
-              <!-- <el-icon class="delete-icon" @click.stop="deleteChat(chat.id)">
+              <el-icon class="delete-icon" @click.stop="deleteChat(chat.id)">
                 <Delete />
-              </el-icon> -->
+              </el-icon>
             </div>
           </el-menu-item>
         </el-menu>
@@ -501,6 +500,8 @@ const clearAllChatData = () => {
   align-items: center;
   gap: 8px;
   padding-right: 8px;
+  position: relative;
+  width: 100%;
 }
 
 .chat-title {
@@ -511,8 +512,12 @@ const clearAllChatData = () => {
 }
 
 .delete-icon {
+  position: absolute;
+  right: 0;
   opacity: 0;
   transition: opacity 0.2s;
+  cursor: pointer;
+  color:var(--el-color-danger) !important;
 }
 
 .chat-item:hover .delete-icon {
